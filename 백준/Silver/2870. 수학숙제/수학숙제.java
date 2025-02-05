@@ -8,6 +8,7 @@ public class Main {
 	static int N;
 	static char[][] str;
 	static ArrayList<BigInteger> nl;
+    
 	public static void main(String[] args) throws Exception{
 		/* 입력 */
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -27,7 +28,7 @@ public class Main {
 		//BigInteger 사용해보자.
 		for (int i = 0; i < N; i++) {
 			for (int j = 0; j < str[i].length; j++) {
-				if(48 <= str[i][j] && str[i][j] <= 57) { //숫자일 경우
+				if(Character.isDigit(str[i][j])) { //숫자일 경우
 					sb.append(String.valueOf(str[i][j]));
 				}else {
 					if(sb.length() != 0) {
