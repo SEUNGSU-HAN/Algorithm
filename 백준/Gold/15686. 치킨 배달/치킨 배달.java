@@ -3,6 +3,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
+//치킨 배달
 public class Main {
 	static int N, M;
 	static int[][] board;
@@ -35,17 +36,18 @@ public class Main {
 		/* 로직 */
 		//존재하는 치킨집 중 m개를 먼저 뽑아 -> nHm (중복 조합)
 		//각 경우의 치킨 거리 값 구하고 최솟값인 치킨 거리 구하기
-		//치킨 거리 값 구하기 => 고른 치킨 집 중심으로 bfs 돌려서 depth 더하기
 		combi(0, 0);
 		
 		/* 출력 */
 		System.out.println(chickenDistance);
 	}
 	
+	//nHr
 	private static void combi(int cnt, int start) {
 		if(cnt == M) { //치킨 다 고른 경우
 			int chkDis = 0;
 			for (int i = 0; i < home.size(); i++) {
+				//M은 1부터니까 0번째 미리 구해서 추후 값과비교
 				int d1 = Math.abs(home.get(i).r-chicken[0].r) 
 						+ Math.abs(home.get(i).c-chicken[0].c);
 				for (int j = 1; j < M; j++) {
@@ -55,7 +57,7 @@ public class Main {
 				}
 				chkDis += d1;
 			}
-			chickenDistance = Math.min(chickenDistance, chkDis);
+			chickenDistance = Math.min(chickenDistance, chkDis); //최솟갑 선정
 			return;
 		}
 		for (int i = start; i < bbq.size(); i++) {
