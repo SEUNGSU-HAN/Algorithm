@@ -8,6 +8,7 @@ public class Main {
 	static int[] hobit;
 	static int[] result;
 	static boolean[] visited;
+	static boolean flag;
 
 	public static void main(String[] args) throws Exception{
 		/* 입력+초기화*/
@@ -34,6 +35,8 @@ public class Main {
 	}
 
 	private static void combi(int cnt, int start, int tot) {
+		if(flag) return;
+		
 		if(cnt == R) {
 			if(tot == 100) System.arraycopy(hobit, 0, result, 0, hobit.length);
 			return;
