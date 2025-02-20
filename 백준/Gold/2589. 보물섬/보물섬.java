@@ -9,7 +9,6 @@ import java.util.StringTokenizer;
 public class Main {
 	static int N, M;
 	static int[][] board;
-	static int[][] tmpBoard;
 	static boolean[][] visited;
 	static ArrayList<int[]> land;
 	static int[] dr = {-1, 0, 1, 0};
@@ -25,7 +24,6 @@ public class Main {
 		
 		/* 초기화 */
 		board = new int[N][M];
-		tmpBoard = new int[N][M];
 		land = new ArrayList<>();
 		for (int i = 0; i < N; i++) {
 			char[] cl = br.readLine().toCharArray();
@@ -40,19 +38,12 @@ public class Main {
 		
 		/* 로직 */
 		for (int i = 0; i < land.size(); i++) {
-			copyBoard();
 			visited = new boolean[N][M];
 			bfs(i, 0);
 		}
 		
 		/* 출력 */
 		System.out.print(minDis);
-	}
-
-	private static void copyBoard() {
-		for (int i = 0; i < N; i++) {
-			System.arraycopy(board[i], 0, tmpBoard[i], 0, board[0].length);
-		}
 	}
 
 	private static void bfs(int start, int cnt) {
@@ -62,7 +53,6 @@ public class Main {
 		visited[sp[0]][sp[1]] = true;
 		while(!q.isEmpty()) {
 			int[] cur = q.poll();
-			tmpBoard[cur[0]][cur[1]] = cur[2];
 			minDis = Math.max(minDis, cur[2]);
 			for (int i = 0; i < 4; i++) {
 				int nr = cur[0]+dr[i];
@@ -79,7 +69,7 @@ public class Main {
 	private static boolean check(int nr, int nc) {
 		return ((0 <= nr && nr < N) && (0 <= nc && nc < M) 
 				&& !visited[nr][nc]
-				&& tmpBoard[nr][nc] != -1);
+				&& board[nr][nc] != -1);
 	}
 
 }
