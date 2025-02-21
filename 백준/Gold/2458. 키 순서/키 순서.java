@@ -1,84 +1,79 @@
-
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Queue;
 import java.util.StringTokenizer;
 
-class Main {
-    static int T, N, M;
-    static int cnt;
-    static int sum;
-    static boolean[] visited;
-    static ArrayList<Integer>[] heightArr;
-    static ArrayList<Integer>[] heightArrRev;
-    public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st = new StringTokenizer(br.readLine());
-            N = Integer.parseInt(st.nextToken());
-            M = Integer.parseInt(st.nextToken());
+public class Main {
+	static final int INF = 999;
+	static int N, M;
+	static int[][] board;
+	static int[][] reboard;
+	
+	static int[][] maxBoard;
+	static int[][] remaxBoard;
+	
+	static int[][] resultBoard;
+	static int result;
 
-            cnt = 0;
-            heightArr = new ArrayList[N+1];
-            heightArrRev = new ArrayList[N+1];
-            for (int i = 0; i < heightArr.length; i++) {
-                heightArr[i] = new ArrayList<Integer>();
-                heightArrRev[i] = new ArrayList<Integer>();
-            }
-            for (int i = 0; i < M; i++) {
-                st = new StringTokenizer(br.readLine());
-                int small = Integer.parseInt(st.nextToken());
-                int tall = Integer.parseInt(st.nextToken());
-                heightArr[tall].add(small);
-                heightArrRev[small].add(tall);
-            }
-            for (int i = 1; i <= N; i++) {
-                getAns(i);
-            }
-        System.out.println(cnt);
-    }
-    private static void getAns(int i) {
-        visited = new boolean[N+1];
-        visited[i] = true;
-        getSmallCnt(i);
-        getTallerCnt(i);
-        for (int j = 1; j < visited.length; j++) {
-			if(!visited[j]) return;
+	public static void main(String[] args) throws Exception{
+		/* 입력 */
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer st = new StringTokenizer(br.readLine());
+		N = Integer.parseInt(st.nextToken());
+		M = Integer.parseInt(st.nextToken());
+			
+		/* 초기화 */
+		result = N;
+		board = new int[N+1][N+1];
+		reboard = new int[N+1][N+1];
+		for (int i = 0; i < M; i++) {
+			st = new StringTokenizer(br.readLine());
+			int r = Integer.parseInt(st.nextToken());
+			int c = Integer.parseInt(st.nextToken());
+			board[r][c] = 1;
+			reboard[c][r] = 1;
 		}
-        cnt++;
-        return;
-    }
-    private static void getTallerCnt(int n) {
-    	Queue<Integer> que = new ArrayDeque<>();
-    	for (int x : heightArrRev[n]) {
-    		visited[x] = true;
-    		que.offer(x);
-    	}
-    	while(!que.isEmpty()) {
-    		int b = que.poll();
-    		for (int x : heightArrRev[b]) {
-    			if(visited[x]) continue;
-        		visited[x] = true;
-        		que.offer(x);
-        	}
-    	}
-    }
-    private static void getSmallCnt(int n) {
-    	Queue<Integer> que = new ArrayDeque<>();
-    	visited[n] = true;
-    	for (int x : heightArr[n]) {
-    		visited[x] = true;
-    		que.offer(x);
-    	}
-    	while(!que.isEmpty()) {
-    		int b = que.poll();
-    		for (int x : heightArr[b]) {
-    			if(visited[x]) continue;
-        		visited[x] = true;
-        		que.offer(x);
-        	}
-    	}
-    }
+		maxBoard = new int[N+1][N+1];
+		remaxBoard = new int[N+1][N+1];
+		for (int i = 1; i <= N; i++) {
+			for (int j = 1; j <= N; j++) {
+				if(i == j) maxBoard[i][j] = 0;
+				else if(board[i][j] > 0) maxBoard[i][j] = board[i][j];
+				else maxBoard[i][j] = INF;
+			}
+		}
+		for (int i = 1; i <= N; i++) {
+			for (int j = 1; j <= N; j++) {
+				if(i == j) remaxBoard[i][j] = 0;
+				else if(reboard[i][j] > 0) remaxBoard[i][j] = reboard[i][j];
+				else remaxBoard[i][j] = INF;
+			}
+		}
+
+		/* 로직 */
+		//플루이드 워셜 활용
+		for (int k = 1; k <= N; k++) {
+			for (int i = 1; i <= N; i++) {
+				for (int j = 1; j <= N; j++) {
+					maxBoard[i][j] = Math.min(maxBoard[i][j], maxBoard[i][k]+maxBoard[k][j]);
+					remaxBoard[i][j] = Math.min(remaxBoard[i][j], remaxBoard[i][k]+remaxBoard[k][j]);
+				}
+			}
+		}
+		//보드 종합
+		resultBoard = new int[N+1][N+1];
+		for (int i = 0; i <= N; i++) {
+			for (int j = 0; j <= N; j++) {
+				resultBoard[i][j] = Math.min(maxBoard[i][j], remaxBoard[i][j]);
+				if(resultBoard[i][j] == INF) {
+					result--;
+					break;
+				}
+			}
+		}
+		
+		
+		/* 출력 */
+		System.out.print(result);
+		
+	}
 }
