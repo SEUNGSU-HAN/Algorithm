@@ -1,5 +1,6 @@
 import java.util.*;
 
+//재귀 버전으로 풀기
 public class Main {
 	static int N , R, C;
 	static boolean[][] board;
