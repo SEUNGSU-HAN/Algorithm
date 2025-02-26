@@ -1,94 +1,73 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.StringTokenizer;
+import java.io.*;
+import java.util.*;
 
-class Main {
+public class Main {
 	static int N;
-	static int[][] inningResult;
-	static int[] sunser;
-	static boolean[] visited;
-	static int ans;
-
-	public static void main(String[] args) throws IOException {
+	static int[][] inning;
+	static int[] order; //타석 순서
+	static int score;
+	
+	public static void main(String[] args) throws Exception{
+		/* 입력 */
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		StringTokenizer st = new StringTokenizer(br.readLine());
-
 		N = Integer.parseInt(st.nextToken());
-		inningResult = new int[N][9];
-		sunser = new int[9];
-		sunser[3] = 0;
-
-		visited = new boolean[9];
-		visited[0] = true;
+		
+		/* 초기화 */
+		inning = new int[N][9];
 		for (int i = 0; i < N; i++) {
 			st = new StringTokenizer(br.readLine());
 			for (int j = 0; j < 9; j++) {
-				inningResult[i][j] = Integer.parseInt(st.nextToken());
+				inning[i][j] = Integer.parseInt(st.nextToken());
 			}
 		}
-		ans = -1;
-		getSunser(0);
-		System.out.println(ans);
+		order = new int[9];
+		
+		/* 로직 */
+		perm(0, 0);
+		
+		/* 출력 */
+		System.out.print(score);
 	}
 
-	private static void getSunser(int depth) {
-		if (depth == 3) {
-			getSunser(depth + 1);
-			return;
-		}
-
-		if (depth == 9) {
-			ans = Math.max(ans, getPoint());
+	private static void perm(int cnt, int flag) {
+		if(cnt == 9) {
+			int idx = 0;
+			int sum = 0;
+			for (int i = 0; i < N; i++) {
+				int outCount = 0;
+				int base = 0;
+				while(outCount != 3) {
+					int s = inning[i][order[idx++%9]];
+					if(s == 0) {
+						outCount++;
+					}else {
+						for (int j = 0; j < s; j++) {
+							//루수들 한칸씩 이동
+							base = base<<1;
+							
+							if(j == 0) base = base | 1<<0; //타자 진출
+							
+							//홈에 들어왔는지체크
+							if((base & 1<<3) != 0) { //홈에 들어왔다면
+								sum++; //점수 증가
+								//홈 비우기
+								base = base ^ 1<<3; //XOR 연산
+							}
+							
+						}
+					}
+				}
+			}
+			score = Math.max(score, sum);	
 			return;
 		}
 		for (int i = 0; i < 9; i++) {
-			if (visited[i])continue;
-			visited[i] = true;
-			sunser[depth] = i;
-			getSunser(depth + 1);
-			sunser[depth] = 0;
-			visited[i] = false;
+			if((flag & 1<<i) != 0) continue;
+			if(cnt == 3 && i != 0) continue;
+			order[cnt] = i;
+			perm(cnt+1, flag | 1<<i);
 		}
-	}
-
-	private static int getPoint() {
-		int sunserIdx = 0;
-		int totPoint = 0;
-		for (int i = 0; i < N; i++) {
-			int outCnt = 0;
-			int point = 0;
-			while (outCnt < 3) {
-				int hit = inningResult[i][sunser[(sunserIdx++) % 9]];
-				switch (hit) {
-				case 1:
-					point++;
-					point <<= 1;
-					break;
-				case 2:
-					point++;
-					point <<= 2;
-					break;
-				case 3:
-					point++;
-					point <<= 3;
-					break;
-				case 4:
-					point++;
-					point <<= 4;
-					break;
-				case 0:
-					outCnt++;
-					continue;
-				}
-				for (int j = 128; j >= 16; j >>= 1) {
-					if((point & j) == 0) continue;
-					totPoint += point / j;
-					point %= j;
-				}
-			}
-		}
-		return totPoint;
 	}
 
 }
