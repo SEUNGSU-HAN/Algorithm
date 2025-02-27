@@ -1,9 +1,9 @@
 import java.io.*;
 import java.util.*;
 
-public class Main{
+public class Main {
     static int N;
-    static int[] nums;
+    static int min = 9_999_999, max = -9_999_999;
     
     public static void main(String[] args) throws Exception{
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -11,12 +11,12 @@ public class Main{
         N = Integer.parseInt(st.nextToken());
         
         st = new StringTokenizer(br.readLine());
-        nums = new int[N];
         for(int i = 0; i < N; i++){
-            nums[i] = Integer.parseInt(st.nextToken());
+            int n = Integer.parseInt(st.nextToken());
+            min = Math.min(min, n);
+            max = Math.max(max, n);
         }
-        Arrays.sort(nums);
         
-        System.out.print(nums[0] + " " + nums[N-1]);
+        System.out.print(min + " " + max);
     }
 }
