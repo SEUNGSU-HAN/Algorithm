@@ -5,10 +5,10 @@ import java.util.*;
 public class Main {
 	static int N, M;
 	static int[][] board;
-	static ArrayList<int[]> shark;
+	static Queue<int[]> shark;
 	static int[] dr = {-1, -1, 0, 1, 1, 1, 0, -1};
 	static int[] dc = {0, 1, 1, 1, 0, -1, -1, -1};
-	static boolean[][] visited;
+	static int[][] visited;
 	static int maxD = 0;
 	
 	public static void main(String[] args) throws Exception{
@@ -20,47 +20,49 @@ public class Main {
 		
 		/* 초기화 */
 		board = new int[N][M];
-		shark = new ArrayList<>();
+		visited = new int[N][M];
+		shark = new ArrayDeque<>();
 		for (int i = 0; i < N; i++) {
 			st = new StringTokenizer(br.readLine());
+			Arrays.fill(visited[i], -1);
 			for (int j = 0; j < M; j++) {
 				board[i][j] = Integer.parseInt(st.nextToken());
-				if(board[i][j] == 1) shark.add(new int[] {i, j});
+				if(board[i][j] == 1) {
+					shark.add(new int[] {i, j});
+					visited[i][j] = 0;
+				}
 			}
 		}
 		
 		/* 로직 */
-		for (int i = 0; i < N; i++) {
-			for (int j = 0; j < M; j++) {
-				if(board[i][j] == 0) {
-					visited = new boolean[N][M];
-					bfs(new int[] {i, j, 0});
-				}
-			}
-		}
+		bfs();
 		
 		/* 출력 */
 		System.out.println(maxD);
 	}
 
-	static void bfs(int[] start) {
-		Queue<int[]> q = new ArrayDeque<>();
-		q.offer(start);
-		visited[start[0]][start[1]] = true;
-		int distance = Integer.MAX_VALUE;
-		while(!q.isEmpty()) {
-			int[] cur = q.poll();
+	static void bfs() {
+		while(!shark.isEmpty()) {
+			int[] cur = shark.poll();
+			int r = cur[0];
+			int c = cur[1];
 			for (int i = 0; i < 8; i++) {
-				int nr = cur[0]+dr[i];
-				int nc = cur[1]+dc[i];
-				if(check(nr, nc) && !visited[nr][nc]) {
-					if(board[nr][nc] == 1) distance = Math.min(distance,  cur[2]+1);
-					visited[nr][nc] = true;
-					q.offer(new int[] {nr, nc, cur[2]+1});
+				int nr = r+dr[i];
+				int nc = c+dc[i];
+				if(check(nr, nc) && visited[nr][nc] < 0) {
+					if(board[nr][nc] == 0) {
+						visited[nr][nc] = visited[r][c]+1;
+						shark.offer(new int[] {nr, nc});
+					}
 				}
 			}
 		}
-		maxD = Math.max(maxD, distance);
+		
+		for (int i = 0; i < N; i++) {
+			for (int j = 0; j < M; j++) {
+				maxD = Math.max(maxD, visited[i][j]);
+			}
+		}
 	}
 
 	static boolean check(int nr, int nc) {
