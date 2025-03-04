@@ -1,38 +1,47 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.Arrays;
-import java.util.StringTokenizer;
+import java.io.*;
+import java.util.*;
 
-class Main {
-	static int N,M;
-	static int[] nums;
-	static int max;
+public class Main {
+	static int N, M, result;
+	static int[] p;
 	
-	public static void main(String[] args) throws IOException {
+
+	public static void main(String[] args) throws Exception{
+		//--------------솔루션 코드를 작성하세요.--------------------------------
+		/* 입력 */
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		StringTokenizer st = new StringTokenizer(br.readLine());
-		
 		N = Integer.parseInt(st.nextToken());
 		M = Integer.parseInt(st.nextToken());
-		nums = new int[N];
-		max = 0;
+		
+		/* 초기화 */
+		p = new int[N];
 		st = new StringTokenizer(br.readLine());
-		for (int i = 0; i < nums.length; i++) {
-			nums[i] = Integer.parseInt(st.nextToken());
+		for (int i = 0; i < N; i++) {
+			p[i] = Integer.parseInt(st.nextToken());
 		}
 		
-		getAns(0,0,0);
-		System.out.println(max);
+		/* 로직 */
+		findSum(0, 0, 0, 0);
+		
+		/* 출력 */
+		System.out.print(result);
 	}
-	private static void getAns(int depth,int start,int sum) {
-		if(sum>M) return;
-		if(depth==3) {
-			max = Math.max(max,sum);
+
+
+	static void findSum(int cnt, int start, int tot, int flag) {
+		if(tot > M) return;
+		
+		if(cnt == 3) {
+			result = Math.max(result, tot);
 			return;
 		}
+		
 		for (int i = start; i < N; i++) {
-			getAns(depth+1,i+1,sum+nums[i]);
+			if((flag & 1<<i) != 0) continue;
+			findSum(cnt+1, i, tot+p[i], (flag | 1<<i));
 		}
 	}
+
 }
+
