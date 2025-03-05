@@ -58,6 +58,7 @@ public class Main {
 		visited[start[0]][start[1]] = true;
 		while(!q.isEmpty()) {
 			int[] cur = q.poll();
+			if(cur[2] > bridge) continue;
 			for (int i = 0; i < 4; i++) {
 				int nr = cur[0]+dr[i];
 				int nc = cur[1]+dc[i];
