@@ -5,6 +5,7 @@ public class Main {
 	static int M, n;
 	static String str;
 	static Set<Integer> set;
+	static int[] nums = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20};
 
 	public static void main(String[] args) throws Exception{
 		/* 입력 */
@@ -21,12 +22,9 @@ public class Main {
 			st = new StringTokenizer(br.readLine());
 			String str = st.nextToken();
 			if(str.equals("all")) {
-				int[] nums = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20};
-//				List<Integer> list = new ArrayList<>(List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20));
 				for (int j = 0; j < nums.length; j++) {
 					set.add(nums[j]);
 				}
-//				set.addAll(list);
 			} else if(str.equals("empty")) set.clear();
 			else {
 				int x = Integer.parseInt(st.nextToken());
