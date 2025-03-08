@@ -3,25 +3,8 @@ import java.util.*;
 
 public class Main {
 	static int N, M;
-	static class Poketmon implements Comparable<Poketmon>{
-		int num;
-		String name;
-		
-		public Poketmon(int num, String name) {
-			this.num = num;
-			this.name = name;
-		}
-
-		@Override
-		public int compareTo(Poketmon o) {
-			if(this.name.equals(o.name))
-				return Integer.compare(this.num, o.num);
-			return this.name.compareTo(o.name);
-		}
-	}
 	static String[] poketmon; //숫자 -> 문자 탐색용
 	static HashMap<String, Integer> poketnum; //문자 -> 숫자 탐색용
-	
 
 	public static void main(String[] args) throws Exception{
 		/* 입력 */
@@ -43,8 +26,7 @@ public class Main {
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < M; i++) {
 			String q = br.readLine();
-			//아스키값 -> 숫자 0 => 48, 대문자 A => 97
-			char c = q.charAt(0);
+			char c = q.charAt(0); //첫번째가 문자인지 숫자인지
 			if(Character.isDigit(c)) {
 				//숫자면 -> 해당 index 포켓몬으로
 				int n = Integer.parseInt(q);
