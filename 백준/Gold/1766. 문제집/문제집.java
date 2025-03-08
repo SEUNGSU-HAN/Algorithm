@@ -29,7 +29,8 @@ public class Main {
 		}
 		//집입차수0인 애들 먼저 넣되 난이도 낮은 애들먼저 처리
 		// => 처리 가능한 애들중 난이도가 쉬운 애들부터 처리
-		q = new PriorityQueue<>(Integer::compare);
+		//우선순위 큐 사용하여 숫자 낮은 애들 먼저 ㄱㄱ
+		q = new PriorityQueue<>();
 		
 		/* 로직 */
 		//진입차수 0인 애들 큐에 추가
