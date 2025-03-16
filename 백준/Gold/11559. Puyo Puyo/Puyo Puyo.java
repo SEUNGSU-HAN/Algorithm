@@ -24,7 +24,7 @@ public class Main {
 		/* 로직 */
 		// 'D'는 삭제 예정 뿌요 표시
 		// 'C'는 이미 체크 했는데 답 없는 애들(어차피 안터질 애들)중복 체크 방지용
-		do {
+		while(true){
 			boom = 0;
 			deepCopy(board, temp);
 			for (int i = N-1; i >= 0; i--) {
@@ -44,8 +44,8 @@ public class Main {
 				result++;
 				//맵 수정
 				mapBuild();
-			}
-		}while(boom != 0);
+			}else break;
+		}
 		
 
 		/* 출력 */
@@ -79,16 +79,6 @@ public class Main {
 		board[e][c] = t;
 	}
 
-	private static void print(char[][] b) {
-		System.out.println("==================");
-		for (int i = 0; i < N; i++) {
-			for (int j = 0; j < M; j++) {
-				System.out.print(b[i][j] + " ");
-			}
-			System.out.println();
-		}
-	}
-
 	static int checkPuyo(int[] start, boolean[][] visited, char py) {
 		Queue<int[]> q = new ArrayDeque<>();
 		q.offer(start);
@@ -120,6 +110,7 @@ public class Main {
 		}else {
 			//한사이클 돌 때 터질 것이 예약된 뿌요 체크
 			for (int[] p : puyo) {
+				//터질 놈들 따로 담아놓음
 				bp.offer(p);
 				temp[p[0]][p[1]] = '.';
 			}
