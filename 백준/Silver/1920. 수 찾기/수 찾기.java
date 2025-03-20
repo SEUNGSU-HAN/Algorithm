@@ -3,7 +3,7 @@ import java.util.*;
 
 public class Main {
 	static int N, M;
-	static int[] nums, check;
+	static int[] nums;
 
 	public static void main(String[] args) throws Exception{
 		/* 입력 */
@@ -17,18 +17,15 @@ public class Main {
 		for (int i = 0; i < N; i++) {
 			nums[i] = Integer.parseInt(st.nextToken());
 		}
-		M = Integer.parseInt(br.readLine().trim());
-		check = new int[M];
-		st = new StringTokenizer(br.readLine());
-		for (int i = 0; i < M; i++) {
-			check[i] = Integer.parseInt(st.nextToken());
-		}
 		
 		/* 로직 */
 		Arrays.sort(nums);
 		StringBuilder sb = new StringBuilder();
+		M = Integer.parseInt(br.readLine().trim());
+		st = new StringTokenizer(br.readLine());
 		for (int i = 0; i < M; i++) {
-			sb.append(Arrays.binarySearch(nums, check[i]) < 0 ? 0 : 1).append("\n");
+			int n = Integer.parseInt(st.nextToken());
+			sb.append(Arrays.binarySearch(nums, n) < 0 ? 0 : 1).append("\n");
 		}
 		
 		/* 출력 */
