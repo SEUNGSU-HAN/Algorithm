@@ -1,15 +1,15 @@
-import java.util.Arrays;
-import java.util.Scanner;
+import java.io.*;
+import java.util.*;
 
 public class Main {
 	static String str;
 	static char[] cl;
 	static int[] counts;
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception{
 		/* 입력 */
-		Scanner sc = new Scanner(System.in);
-		str = sc.nextLine();
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		str = br.readLine().trim();
 		
 		/* 초기화 */
 		cl = str.toCharArray();
