@@ -1,5 +1,4 @@
 import java.io.*;
-import java.lang.reflect.Array;
 import java.util.*;
 
 public class Main {
@@ -26,7 +25,7 @@ public class Main {
 				board[0][i][j] = board[1][i][j];
 			}
 		}
-		start = new int[] {1, 0, 0, 1};
+		start = new int[] {1, 0, 0, 1}; //세계선, r, c, depth
 		visited = new boolean[2][N][M];
 		
 		/* 로직 */
@@ -38,6 +37,7 @@ public class Main {
 			int[] cur = q.poll();
 			int z = cur[0];
 			int depth = cur[3];
+			if(depth >= result) continue;
 			if(cur[1] == N-1 && cur[2] == M-1) {
 				result = Math.min(result, depth);
 			}
@@ -47,6 +47,7 @@ public class Main {
 				if(check(nr, nc) && !visited[z][nr][nc]) {
 					if(board[z][nr][nc] == 1) {
 						if(z > 0) {
+							//파괴권이 없는 세계선으로 이동
 							visited[z-1][nr][nc] = true;
 							q.offer(new int[] {z-1, nr, nc, depth+1});
 						}
