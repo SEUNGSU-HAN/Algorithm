@@ -6,7 +6,7 @@ public class Main {
 	static int[] dr = {-1, 0, 1, 0};
 	static int[] dc = {0, 1, 0, -1};
 	static int[] start;
-	static int[][][] board;
+	static int[][] board;
 	static boolean[][][] visited;
 
 	public static void main(String[] args) throws Exception{
@@ -17,12 +17,11 @@ public class Main {
 		M = Integer.parseInt(st.nextToken());
 		
 		/* 초기화 */
-		board = new int[2][N][M];
+		board = new int[N][M];
 		for (int i = 0; i < N; i++) {
 			char[] cl = br.readLine().toCharArray();
 			for (int j = 0; j < cl.length; j++) {
-				board[1][i][j] = cl[j]-'0';
-				board[0][i][j] = board[1][i][j];
+				board[i][j] = cl[j]-'0';
 			}
 		}
 		start = new int[] {1, 0, 0, 1}; //세계선, r, c, depth
@@ -45,7 +44,7 @@ public class Main {
 				int nr = cur[1]+dr[i];
 				int nc = cur[2]+dc[i];
 				if(check(nr, nc) && !visited[z][nr][nc]) {
-					if(board[z][nr][nc] == 1) {
+					if(board[nr][nc] == 1) {
 						if(z > 0) {
 							//파괴권이 없는 세계선으로 이동
 							visited[z-1][nr][nc] = true;
