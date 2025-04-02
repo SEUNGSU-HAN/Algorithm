@@ -3,10 +3,8 @@ import java.util.*;
 
 public class Main {
 	static int K, C, R, result;
-	static int dr[] = {0, 1, -1, 0}; //원숭이의 움직임
-	static int dc[] = {1, 0, 0, -1};
-	static int hdr[] = {-1, -2, 1, -2, 2, -1, 2, 1}; //말의 움직임
-	static int hdc[] = {2, 1, 2, -1, 1, -2, -1, -2};
+	static int dr[] = {0, 1, -1, 0, -1, -2, 1, -2, 2, -1, 2, 1}; //원숭이(4) + 말(8)의 움직임
+	static int dc[] = {1, 0, 0, -1, 2, 1, 2, -1, 1, -2, -1, -2};
 	static class Monkey {
 		int r, c, h, d; //r, c, horse권, depth
 
@@ -39,7 +37,9 @@ public class Main {
 		visited = new boolean[K+1][R][C];
 		
 		/* 로직 */
-		result = bfs();
+		if(R == 1 && C == 1) result = 0;
+		else result = bfs();
+
 		
 		/* 출력 */
 		System.out.print(result);
@@ -53,24 +53,19 @@ public class Main {
 		visited[K][0][0] = true;
 		while(!q.isEmpty()) {
 			Monkey cur = q.poll();
-			int h = cur.h;
 			int depth = cur.d;
-			if(cur.r == R-1 && cur.c == C-1) return depth;
-			if(cur.h > 0) {
-				for (int i = 0; i < 8; i++) {
-					int nr = cur.r+hdr[i];
-					int nc = cur.c+hdc[i];
-					if(!check(nr, nc) || board[nr][nc] || visited[h-1][nr][nc]) continue;
-					visited[h-1][nr][nc] = true;
-					q.offer(new Monkey(nr, nc, depth+1, h-1));
-				}
-			}
-			for (int i = 0; i < 4; i++) {
+			for (int i = 0; i < 12; i++) {
 				int nr = cur.r+dr[i];
 				int nc = cur.c+dc[i];
-				if(!check(nr, nc) || board[nr][nc] || visited[h][nr][nc]) continue;
-				visited[h][nr][nc] = true;
-				q.offer(new Monkey(nr, nc, depth+1, h));
+				int nh = cur.h;
+				if(i > 3) { //말이 될 수 있니~?
+					if(cur.h == 0) break; //No 못함 (원숭이 이동에서 끝)
+					else nh--; //Yes 가능 말로 이동(횟수권 1회 감소)
+				}
+				if(!check(nr, nc) || board[nr][nc] || visited[nh][nr][nc]) continue;
+				if(nr == R-1 && nc == C-1) return depth+1;
+				visited[nh][nr][nc] = true;
+				q.offer(new Monkey(nr, nc, depth+1, nh));
 			}
 		}
 		return -1;
