@@ -1,5 +1,4 @@
 import java.io.*;
-import java.math.BigInteger;
 import java.util.*;
 
 public class Main {
@@ -33,10 +32,10 @@ public class Main {
 			for (int j = 0; j < M; j++) {
 				board[i][j] = input.charAt(j);
 				if('a' <= board[i][j] && board[i][j] <= 'f') Key++;
-				if(board[i][j] == '0') minsik = new Node(Integer.parseInt("10000000", 2), i, j, 0);
+				if(board[i][j] == '0') minsik = new Node(1<<7, i, j, 0);
 			}
 		}
-		visited = new boolean[Integer.parseInt("11111111", 2)][N][M];
+		visited = new boolean[(1<<8)-1][N][M];
 		
 		/* 로직 */
 		result = bfs();
@@ -51,7 +50,6 @@ public class Main {
 		visited[minsik.z][minsik.r][minsik.c] = true;
 		while(!q.isEmpty()) {
 			Node cur = q.poll();
-//			System.out.println("r: " + cur.r + ", c: " + cur.c + ", depth: " + cur.d + ", z: " + Integer.toBinaryString(cur.z));
 			for (int i = 0; i < 4; i++) {
 				int nr = cur.r+dr[i];
 				int nc = cur.c+dc[i];
