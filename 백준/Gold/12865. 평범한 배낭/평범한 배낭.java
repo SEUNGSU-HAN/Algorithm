@@ -4,7 +4,7 @@ import java.util.*;
 public class Main {
 	static int N, K;
 	static int[] W, V;
-	static int[][] dp;
+	static int[] dp;
 
 	public static void main(String[] args) throws Exception{
 		/* 입력 */
@@ -14,7 +14,7 @@ public class Main {
 		K = Integer.parseInt(st.nextToken());
 				
 		/* 초기화 */
-		dp = new int[N+1][K+1];
+		dp = new int[K+1];
 		W = new int[N+1];
 		V = new int[N+1];
 		for (int i = 1; i <= N; i++) {
@@ -27,14 +27,13 @@ public class Main {
 		
 		/* 로직 */
 		for (int i = 1; i <= N; i++) {
-			for (int j = 1; j <= K; j++) {
-				if(W[i] > j) dp[i][j] = dp[i-1][j];
-				else dp[i][j] = Math.max(dp[i-1][j], dp[i-1][j-W[i]]+V[i]);
+			for (int j = K; j >= W[i]; j--) {
+				dp[j] = Math.max(dp[j], dp[j-W[i]]+V[i]);
 			}
 		}
 		
 		/* 출력 */
-		System.out.print(dp[N][K]);
+		System.out.print(dp[K]);
 	}
 
 }
