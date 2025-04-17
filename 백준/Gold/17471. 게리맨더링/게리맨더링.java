@@ -1,127 +1,118 @@
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.StringTokenizer;
+import java.io.*;
+import java.util.*;
 
 public class Main {
-	static int N;
+	static int N, result=-1;
 	static int[] people;
-	static boolean[] visited;
 	static ArrayList<Integer>[] graph;
-	static boolean[] tfVisited;
-	static int minDiff = Integer.MAX_VALUE;
-	static int sum;
-	
+
 	public static void main(String[] args) throws Exception{
 		/* 입력 */
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st = new StringTokenizer(br.readLine());
-		N = Integer.parseInt(st.nextToken());
+		N = Integer.parseInt(br.readLine().trim());
 		
 		/* 초기화 */
-		people = new int[N+1];
-		visited = new boolean[N+1];
-		tfVisited = new boolean[N+1];
-		graph = new ArrayList[N+1];
-		for (int i = 0; i <= N; i++) {
-			graph[i] = new ArrayList<>();
-		}
-		st = new StringTokenizer(br.readLine());
-		for (int i = 1; i <= N; i++) {
+		StringTokenizer st = new StringTokenizer(br.readLine());
+		people = new int[N];
+		for (int i = 0; i < N; i++) {
 			people[i] = Integer.parseInt(st.nextToken());
 		}
-		for (int i = 1; i <= N; i++) {
-			st = new StringTokenizer(br.readLine());
-			int temp = Integer.parseInt(st.nextToken());
-			for (int j = 0; j < temp; j++) {
-				int n = Integer.parseInt(st.nextToken());
-				graph[i].add(n);
-				graph[n].add(i);
-			}
+		graph = new ArrayList[N];
+		for (int i = 0; i < N; i++) {
+			graph[i] = new ArrayList<>();
 		}
-		for (int i = 1; i <= N; i++) {
-			sum += people[i];
+		for (int i = 0; i < N; i++) {
+			st = new StringTokenizer(br.readLine());
+			int m = Integer.parseInt(st.nextToken());
+			for (int j = 0; j < m; j++) {
+				int e = Integer.parseInt(st.nextToken())-1;
+				graph[i].add(e);
+			}
 		}
 		
 		/* 로직 */
-		subSet(1, 0);
+		//1. 선거구를 분리 (subset 활용 -> N이 10이하라 가능)
+		//비트마스킹으로 방문관리
+		seperateDistrict(0, 0);
 		
 		/* 출력 */
-		if(minDiff == Integer.MAX_VALUE) minDiff = -1;
-		System.out.println(minDiff);
+		System.out.print(result);
 	}
 
-	private static void subSet(int cnt, int tot) {
-		if(cnt == N+1) {
-			ArrayList<Integer> tp = new ArrayList<>(); //true 구역
-			ArrayList<Integer> fp = new ArrayList<>();//false 구역
-			for (int i = 1; i <= N; i++) {
-				if(visited[i]) tp.add(i);
-				else fp.add(i);
+	static void seperateDistrict(int cnt, int flag) {
+		if(cnt == N) {
+			if(flag == 0 || Integer.bitCount(flag) == N) return; //모두 야당 혹은 여당인 경우
+			
+			//2. 각 선거구가 연결되있는지 확인
+			int trueCount = Integer.bitCount(flag); //여당 수
+			int falseCount = N-Integer.bitCount(flag); //야당 수
+			
+			//true파(여당) 확인
+			boolean trueIsConn = trueCount == 1 ? true : false;
+			if(!trueIsConn) {
+				for (int i = 0; i < N; i++) {
+					if((flag & 1<<i) > 0) {
+						trueIsConn = bfs(i, flag, true);
+						break;
+					}
+				}
+			}
+			//false파(야당) 확인
+			boolean falseIsConn = falseCount == 1 ? true : false;
+			if(!falseIsConn) {
+				for (int i = 0; i < N; i++) {
+					if((flag & 1<<i) == 0) {
+						falseIsConn = bfs(i, flag, false);
+						break;
+					}
+				}
 			}
 			
-			//불가능한 방법1 - 한쪽 선거구가 비었음
-			if(tp.size() == 0 || fp.size() == 0) return;
-			int con = bfs(tp, fp);
-			minDiff = Math.min(minDiff, con);
+			//둘 중 하나라도 연결 안되 있으면 불가능 
+			if(!trueIsConn || !falseIsConn) return;
+			
+			//3. 각 선거구 인구 더하기
+			int trueSum=0, falseSum=0;
+			for (int i = 0; i < N; i++) {
+				if((flag & 1<<i) > 0) trueSum += people[i];
+				else falseSum += people[i];
+			}
+			
+			//인구차의 최소 값 구하기
+			int tdDiff = Math.abs(trueSum-falseSum);
+			result = result == -1 ? tdDiff : Math.min(result, tdDiff);
 			return;
 		}
-		visited[cnt] = true;
-		subSet(cnt+1, tot+people[cnt]);
-		visited[cnt] = false;
-		subSet(cnt+1, tot);
+		seperateDistrict(cnt+1, flag | 1<<cnt); 
+		seperateDistrict(cnt+1, flag); 
 	}
 
-	private static int bfs(ArrayList<Integer> tp, ArrayList<Integer> fp) {
-		Queue<Integer> q = new LinkedList<>();
-
-		int temp = tp.get(0);
-		int tConn = people[temp];
-		q.offer(temp);
-		tfVisited[temp] = true;
-		//true 구역 집계
+	static boolean bfs(int start, int flag, boolean tf) {
+		Queue<Integer> q = new ArrayDeque<>();
+		q.offer(start);
+		int visited = 1<<start;
 		while(!q.isEmpty()) {
-			temp = q.poll();
-			for (int i = 0; i < graph[temp].size(); i++) {
-				int next = graph[temp].get(i);
-				if(check(tp, next)) {
-					q.offer(next);
-					tConn += people[next];
-					tfVisited[next] = true;
+			int cur = q.poll();
+			for (int next : graph[cur]) {
+				if(tf) {
+					if((flag & 1<<next) > 0 && (visited & 1<<next) == 0) {
+						visited |= 1<<next;
+						q.offer(next);
+					}
+				}else {
+					if((flag & 1<<next) == 0 && (visited & 1<<next) == 0) {
+						visited |= 1<<next;
+						q.offer(next);
+					}
 				}
 			}
 		}
 		
-		//false 구역 집계
-		temp = fp.get(0);
-		int fConn = people[temp];
-		q.offer(temp);
-		tfVisited[temp] = true;
-		while(!q.isEmpty()) {
-			temp = q.poll();
-			for (int i = 0; i < graph[temp].size(); i++) {
-				int next = graph[temp].get(i);
-				if(check(fp, next)) {
-					q.offer(next);
-					fConn += people[next];
-					tfVisited[next] = true;
-				}
-			}
+		if(tf) {
+			return visited == flag ? true : false;
+		}else {
+			return Integer.bitCount(visited) == N-Integer.bitCount(flag) ? true : false;
 		}
-		tfVisited = new boolean[N+1];
-		if(sum != (tConn+fConn)) return Integer.MAX_VALUE;
-		
-		return Math.abs(tConn-fConn);
 	}
-
-	private static boolean check(ArrayList<Integer> p, int next) {
-		if(p.contains(next) && !tfVisited[next]) return true;
-		return false;
-	}
-
-
 
 }
