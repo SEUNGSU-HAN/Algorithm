@@ -2,54 +2,47 @@ import java.io.*;
 import java.util.*;
 
 public class Solution {
-	static int T, N, maxTree;
+	static int T, N, result;
 	static int[] tree;
-	static int[] diff;
-	
+
 	public static void main(String[] args) throws Exception{
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st = new StringTokenizer(br.readLine());
-		T = Integer.parseInt(st.nextToken());
+		T = Integer.parseInt(br.readLine().trim());
+		StringBuilder sb = new StringBuilder();
 		
 		for (int test_case = 1; test_case <= T; test_case++) {
 			/* 입력 */
-			st = new StringTokenizer(br.readLine());
-			N = Integer.parseInt(st.nextToken());
+			N = Integer.parseInt(br.readLine().trim());
 			
 			/* 초기화 */
-			st = new StringTokenizer(br.readLine());
 			tree = new int[N];
+			int maxTree = 0;
+			StringTokenizer st = new StringTokenizer(br.readLine());
 			for (int i = 0; i < N; i++) {
 				tree[i] = Integer.parseInt(st.nextToken());
+				maxTree = Math.max(maxTree, tree[i]);
 			}
-			Arrays.sort(tree);
-			maxTree = tree[N-1];
-			diff = new int[N-1];
+			result = 0;
 			
 			/* 로직 */
-			int odd = 0;
-			int even = 0;
-			for (int i = 0; i < N-1; i++) {
-				diff[i] = maxTree-tree[i];
-				odd += diff[i]%2;
-				even += diff[i]/2;
-			}
-			int result = 0;
-			if(odd == even) result = 2*odd;
-			else if(odd > even) {
-				result = 2*odd-1;
-			}else {
-				result += 2*odd;
-				even -= odd;
-				int remain = even*2;
-				result = result + (remain/3)*2+(remain%3);
+			int odd = 0, even = 0;
+			for (int t : tree) {
+				int diff = maxTree-t;
+				odd += diff%2;
+				even += diff/2;
 			}
 			
+			while(even-odd >= 2) {
+				even--;
+				odd += 2;
+			}
+			if(even >= odd) result = 2*even;
+			else result = 2*odd - 1;
+			
 			/* 출력 */
-			System.out.println("#"+test_case+" "+result);
+			sb.append(String.format("#%d %d\n", test_case, result));
 		}
-		
-		
+		System.out.print(sb);
 	}
 
 }
