@@ -10,17 +10,13 @@ public class Main {
 		T = Integer.parseInt(br.readLine().trim());
 		StringBuilder sb = new StringBuilder();
 		
+		/* 초기화 */
+		dp = new long[101];
+		dp[1] = dp[2] = dp[3] = 1;
+		
 		for (int test_case = 0; test_case < T; test_case++) {
 			/* 입력 */
 			N = Integer.parseInt(br.readLine().trim());
-			
-			/* 초기화 */
-			if(N <= 3) {
-				sb.append(1).append("\n");
-				continue;
-			}
-			dp = new long[N+1];
-			dp[1] = dp[2] = dp[3] = 1;
 			
 			/* 로직 */
 			for (int i = 4; i <= N; i++) {
