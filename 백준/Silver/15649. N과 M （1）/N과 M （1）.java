@@ -1,43 +1,38 @@
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.util.StringTokenizer;
-
-//수열 -> nPr
+import java.io.*;
+import java.util.*;
 
 public class Main {
-	static int N;
-	static int M;
+	static int N, M;
 	static int[] nums;
-	static boolean[] visited;
+	static StringBuilder sb;
 
 	public static void main(String[] args) throws Exception{
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		StringTokenizer st = new StringTokenizer(br.readLine());
 		N = Integer.parseInt(st.nextToken());
 		M = Integer.parseInt(st.nextToken());
+		
+		sb = new StringBuilder();
 		nums = new int[M];
-		visited = new boolean[N];
 		
-		perm(0);
+		perm(0, 0);
 		
+		System.out.println(sb.toString());
 	}
-	
-	public static void perm(int cnt) {
+
+	static void perm(int cnt, int flag) {
 		if(cnt == M) {
-			StringBuilder sb = new StringBuilder();
 			for (int i = 0; i < M; i++) {
-				sb.append(nums[i] + " ");
+				sb.append(nums[i]).append(" ");
 			}
-			System.out.println(sb.toString());
+			sb.append("\n");
 			return;
 		}
-		for (int i = 0; i < N; i++) {
-			if(visited[i]) continue;
-			visited[i] = true;
-			nums[cnt] = i+1;
-			perm(cnt+1);
-			nums[cnt] = 0;
-			visited[i] = false;
+		
+		for (int i = 1; i <= N; i++) {
+			if((flag & 1<<i) != 0) continue;
+			nums[cnt] = i;
+			perm(cnt+1, flag | 1<<i);
 		}
 	}
 
