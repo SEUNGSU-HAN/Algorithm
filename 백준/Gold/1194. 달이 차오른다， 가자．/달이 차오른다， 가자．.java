@@ -2,90 +2,97 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-	static int N, M, Key, result;
-	static int[] dr = {-1, 0, 1, 0};
-	static int[] dc = {0, 1, 0, -1};
-	static char[][] board;
+	static int N, M;
+	static char[][][] board;
 	static boolean[][][] visited;
-	static class Node {
-		int z, r, c, d;
-		
-		public Node(int z, int r, int c, int d) {
-			this.z = z;
+	static int dr[] = {-1, 0, 1, 0};
+	static int dc[] = {0, 1, 0, -1};
+	static class Minsik {
+		int r, c, keys, move;
+
+		public Minsik(int r, int c, int keys, int move) {
 			this.r = r;
 			this.c = c;
-			this.d = d;
+			this.keys = keys;
+			this.move = move;
 		}
 	}
-	static Node minsik;
+	static Minsik minsik;
+
 	public static void main(String[] args) throws Exception{
-		/* 입력 */
+		/* 셋팅 */
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		StringTokenizer st = new StringTokenizer(br.readLine());
+		
 		N = Integer.parseInt(st.nextToken());
 		M = Integer.parseInt(st.nextToken());
 		
-		/* 초기화 */
-		board = new char[N][M];
-		for (int i = 0; i < N; i++) {
-			String input = br.readLine().trim();
-			for (int j = 0; j < M; j++) {
-				board[i][j] = input.charAt(j);
-				if('a' <= board[i][j] && board[i][j] <= 'f') Key++;
-				if(board[i][j] == '0') minsik = new Node(1<<7, i, j, 0);
+		board = new char[1<<8][N][M];
+		visited = new boolean[1<<8][N][M];
+		
+		for(int i=0; i < N; i++) {
+			String str = br.readLine();
+			for(int j=0; j < M; j++) {
+				char c = str.charAt(j);
+				if(c == '0') {
+					minsik = new Minsik(i, j, 1<<7, 0);
+					board[0][i][j] = '.';
+				}else board[0][i][j] = c;
 			}
 		}
-		visited = new boolean[(1<<8)-1][N][M];
 		
-		/* 로직 */
-		result = bfs();
-		
-		/* 출력 */
-		System.out.print(result);
-		
+		/* 로직+출력 */
+		System.out.print(bfs());
 	}
+
 	static int bfs() {
-		Queue<Node> q = new ArrayDeque<>();
-		q.offer(minsik);
-		visited[minsik.z][minsik.r][minsik.c] = true;
-		while(!q.isEmpty()) {
-			Node cur = q.poll();
-			for (int i = 0; i < 4; i++) {
+		ArrayDeque<Minsik> dq = new ArrayDeque<Minsik>();
+		dq.offer(minsik);
+		board[minsik.keys][minsik.r][minsik.c] = '#';
+		while(!dq.isEmpty()) {
+			Minsik cur = dq.poll();
+			for(int i=0; i<4; i++) {
 				int nr = cur.r+dr[i];
 				int nc = cur.c+dc[i];
-				int nz = cur.z;
-				if(check(nr, nc) && !visited[nz][nr][nc] && board[nr][nc] != '#') {
-					if(board[nr][nc] == '1') return cur.d+1;
-					if('a' <= board[nr][nc] && board[nr][nc] <= 'f'
-							&& (nz & 1<<(board[nr][nc]-'a')) == 0) {
-						//열쇠를 만나면 열쇠를 먹고 차원 이동
-						//새로운 visited로 새출발
-						nz |= 1<<(board[nr][nc]-'a');
-						visited[nz][nr][nc] = true;
-						q.offer(new Node(nz, nr, nc, cur.d+1));
-						continue;
+				if(check(nr, nc) && board[0][nr][nc] != '#') {					
+					//방문 여부
+					if(board[cur.keys][nr][nc] == '#') continue;
+					
+					//탈출조건
+					if(board[0][nr][nc] == '1') return cur.move+1;
+
+					int next_key = cur.keys;
+					
+					//열쇠 get
+					if(board[0][nr][nc] >= 'a' && board[0][nr][nc] <= 'f') {
+						int key = board[0][nr][nc]-'a';
+						
+						//처음 먹는 열쇠다? -> 해당 열쇠를 포함한 차원으로 이동.(열쇠값 업데이트)
+						if((cur.keys & 1<<key) == 0) 
+							next_key = cur.keys|1<<key;
+						//이미 있는 열쇠다? -> 땅바닥과 다름 없음.(그대로 이동)
 					}
-					if('A' <= board[nr][nc] && board[nr][nc] <= 'F'
-							&& (nz & 1<<(board[nr][nc]-'A')) > 0) {
-						//문을 만났는데 열쇠가 있으면 문열고 이동
-						//열쇠가 없으면 벽이나 다름 없음
-						visited[nz][nr][nc] = true;
-						q.offer(new Node(nz, nr, nc, cur.d+1));
-						continue;
+					
+					//문 만났을 때
+					if(board[0][nr][nc] >= 'A' && board[0][nr][nc] <= 'F') {
+						int wall = board[0][nr][nc]-'A';
+						
+						//열쇠가 없다? -> 벽과 다름 없음.(이동 불가)
+						if((cur.keys & 1<<wall) == 0) continue;
+						//열쇠가 있다? -> 땅바닥과 다름 없음.(그대로 이동)
 					}
-					//그냥 이동
-					if(!('A' <= board[nr][nc] && board[nr][nc] <= 'F')) {
-						visited[nz][nr][nc] = true;
-						q.offer(new Node(nz, nr, nc, cur.d+1));						
-					}
+					
+					dq.offer(new Minsik(nr, nc, next_key, cur.move+1));
+					board[next_key][nr][nc] = '#';
 				}
 			}
 		}
+		
 		return -1;
 	}
-	
-	static boolean check(int nr, int nc) {
-		return (0 <= nr && nr < N) && (0 <= nc && nc < M);
-	}
 
+
+	static boolean check(int nr, int nc) {
+		return (nr >= 0 && nr < N) && (nc >= 0 && nc < M);
+	}
 }
