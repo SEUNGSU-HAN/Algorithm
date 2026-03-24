@@ -7,7 +7,6 @@ public class Main {
 	static int[] dr = {-1, 1, 0, 0};
 	static int[] dc = {0, 0, -1, 1};
 	static int[] direct_order; //0->3 = 상,하,좌,우 순
-	static int[] result;
 
 	public static void main(String[] args) throws Exception{
 		/* 셋팅 */
@@ -19,7 +18,6 @@ public class Main {
 		
 		board = new int[R][C];
 		direct_order = new int[4];
-		result = new int[4];
 		
 		int brick = Integer.parseInt(reader.readLine());
 		for(int i=0; i<brick; i++) {
@@ -46,19 +44,18 @@ public class Main {
 		
 		while(escape_count < 4) {
 			escape_count = 0;
-						
+			
 			//정해진 방향으로 전진
 			for(int i=1; i<R+C; i++) {
 				int nr = robot[0]+dr[direct_order[direct]];
 				int nc = robot[1]+dc[direct_order[direct]];
+
 				if(check(nr, nc) && board[nr][nc] == 0) {
 					//갈 수 있으면 계속 가자.
 					robot[0]=nr;
 					robot[1]=nc;
 					board[nr][nc] = 1;
-				}else {
-					break;
-				}
+				}else break;
 			}
 
 			
@@ -66,13 +63,12 @@ public class Main {
 			for(int i=0; i<4; i++) {
 				int nr = robot[0]+dr[direct_order[(direct+i)%4]];
 				int nc = robot[1]+dc[direct_order[(direct+i)%4]];
+				
 				if(check(nr, nc) && board[nr][nc] == 0) {
 					direct = (direct+i)%4;
 					break;
 				}
-				else {
-					escape_count++;
-				}
+				else escape_count++;
 			}
 		}
 		
