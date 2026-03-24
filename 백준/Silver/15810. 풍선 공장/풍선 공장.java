@@ -5,7 +5,6 @@ public class Main {
 	static int N, M;
 	static int[] A;
 	static long time;
-	
 	public static void main(String[] args) throws Exception{
 		/* 셋팅 */
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -16,17 +15,17 @@ public class Main {
 		
 		A = new int[N];
 		
+		int min_time = Integer.MAX_VALUE;
 		st = new StringTokenizer(br.readLine());
 		for(int i=0; i<N; i++) {
 			A[i] = Integer.parseInt(st.nextToken());
+			if(A[i] < min_time) min_time = A[i];
 		}
 		
 		/* 로직 */
 		//이분 탐색을 써서 풀어야 함
-		Arrays.sort(A);
-		
 		long low = 1;
-		long high = (long)A[0]*M;
+		long high = (long)min_time*M;
 		
 		while(low <= high) {
 			long mid = (low+high)/2;
@@ -50,6 +49,7 @@ public class Main {
 		long count = 0;
 		for(int i=0; i<N; i++) {
 			count += t/A[i];
+			if(count >= M) break;
 		}
 		return count;
 	}
