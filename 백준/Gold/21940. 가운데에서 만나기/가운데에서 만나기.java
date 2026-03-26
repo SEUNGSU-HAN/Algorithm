@@ -4,17 +4,8 @@ import java.util.*;
 public class Main {
 	static final int INF = 9999999;
 	static int N, M, K;
-	static class Country {
-		int n, max_time; //도시번호, 해당도시의 왕복시간들 중 최대 값
-		
-		public Country(int n, int max_time) {
-			this.n = n;
-			this.max_time = max_time;
-		}
-	}
 	static int[][] dist;	
 	static int[] people;
-	static PriorityQueue<Country> countries;
 
 	public static void main(String[] args) throws Exception{
 		/* 셋팅 */
@@ -49,9 +40,7 @@ public class Main {
 			int c = Integer.parseInt(st.nextToken());
 			people[i] = c;
 		}
-		
-		countries = new PriorityQueue<>((o1, o2) -> o1.max_time == o2.max_time ? o1.n - o2.n : o1.max_time - o2.max_time);
-		
+				
 		/* 로직 */
 		//플로이드 워샬 알고리즘 사용
 		for(int k=1; k<=N; k++) {			
@@ -64,27 +53,36 @@ public class Main {
 			}
 			
 		}
+		
+		int min = INF;
+		int[] countries = new int[N+1];
 		for(int i=1; i<=N; i++) {
 			int max = 0;
+			boolean can_gather = true;// 왕복이 불가능한 경우를 걸러내기 위한 플래그
+			
 			for(int j=0; j<K; j++) {
-				max = Math.max(max, dist[i][people[j]]+dist[people[j]][i]);
+				int p = people[j];
+				
+				//갈 수 없거나 올 수 없으면 패스
+				if (dist[p][i] == INF || dist[i][p] == INF) {
+					can_gather = false;
+                    break;
+                }
+				max = Math.max(max, dist[p][i] + dist[i][p]);
 			}
 			
-			
-			countries.offer(new Country(i, max));
+			if (can_gather) {
+				countries[i] = max;
+				min = Math.min(min, max); // 가장 작은 왕복 시간 갱신
+            } else countries[i] = INF; // 모일 수 없는 도시는 INF 처리
+            
 		}
 
 		
 		/* 출력 */
 		StringBuilder sb = new StringBuilder();
-		int pre = countries.peek().max_time;
-		while(!countries.isEmpty()) {
-			Country c = countries.poll();
-			
-			if(pre != c.max_time)break;
-			
-			sb.append(c.n).append(" "); 
-			pre = c.max_time;
+		for(int i=1; i<=N; i++) {
+			if(min == countries[i]) sb.append(i).append(" ");
 		}
 		
 		System.out.print(sb.toString());
