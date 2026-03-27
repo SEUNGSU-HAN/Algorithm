@@ -37,7 +37,7 @@ public class Main {
 		}
 		
 		int m = 0;
-		for(int j=0; j<1024; j++) {
+		for(int j=1023; j>=0; j--) {
 			if(dp[M][j]) m = Math.max(m, j);
 		}
 		
