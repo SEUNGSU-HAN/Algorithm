@@ -60,16 +60,16 @@ public class Main {
 		}
 		
 		/* 로직 */
-		//다익스트라를 써보자
-		Arrays.sort(homeList);
-		
+		//다익스트라를 써보자		
 		int homeNum = 0;
 		int minDist = INF;
 		
 		Dijkstra(conviList);
 
 		for(int h : homeList) {
-			if(minDist > dist[h]) {
+			if(minDist == dist[h]) {
+				homeNum = homeNum > h ? h : homeNum;
+			}else if(minDist > dist[h]) {
 				homeNum = h;
 				minDist = dist[h];
 			}
