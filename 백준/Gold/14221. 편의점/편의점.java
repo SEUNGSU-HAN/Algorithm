@@ -97,7 +97,7 @@ public class Main {
 			for(Edge next : graph[cur.v]) {
 				if(dist[next.v] > next.w + dist[cur.v]) {
 					dist[next.v] = next.w + dist[cur.v];
-					pq.offer(next);
+					pq.offer(new Edge(next.v, dist[next.v]));
 				}
 			}
 		}
