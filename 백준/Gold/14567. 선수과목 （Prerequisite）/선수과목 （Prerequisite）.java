@@ -35,21 +35,20 @@ public class Main {
 		ArrayDeque<Integer> dq = new ArrayDeque<>();
 		
 		for(int i=1; i<=N; i++) {
-			if(inDegree[i] == 0) dq.offer(i);
+			if(inDegree[i] == 0) {
+				dq.offer(i);
+				result[i] = 1;
+			}
 		}
 		
-		int count = 0;
 		while(!dq.isEmpty()) {
-			int n = dq.size();
+			int cur = dq.poll();
 			
-			count++;
-			while(n-- > 0) {
-				int cur = dq.poll();
-				result[cur] = count;
-				
-				//현재 노드가 진출하는 노드의 진입차수 제거하면서 체크
-				for(int next : outDegree[cur]) {
-					if(--inDegree[next] == 0) dq.offer(next);
+			//현재 노드가 진출하는 노드의 진입차수 제거하면서 체크
+			for(int next : outDegree[cur]) {
+				if(--inDegree[next] == 0) {
+					dq.offer(next);
+					result[next] = result[cur]+1;
 				}
 			}
 		}
