@@ -3,11 +3,17 @@ import java.util.*;
 
 public class Main {
 	static int N, M;
-	static ArrayList<Integer>[] outDegree; //진출
+	static class Edge {
+		int v, w;
+		
+		public Edge(int v, int w) {
+			this.v = v;
+			this.w = w;
+		}
+	}
+	static ArrayList<Edge>[] outDegree; //진출
 	static int[] inDegree; //진입 차수
-	static int[][] reqPart; //필요 부품 개수
 	static int[][] basicPart; //최종 기본 부품 개수(dp)
-	static boolean[] isBasic; //기본 부품 여부
 	
 	public static void main(String[] args) throws Exception{
 		/* 셋팅 */
@@ -21,9 +27,7 @@ public class Main {
 			outDegree[i] = new ArrayList<>();
 		}
 		inDegree = new int[N+1];
-		reqPart = new int[N+1][N+1];
 		basicPart = new int[N+1][N+1];
-		isBasic = new boolean[N+1];
 		
 		StringTokenizer st;
 		for(int i=0; i<M; i++) {
@@ -32,8 +36,7 @@ public class Main {
 			int y = Integer.parseInt(st.nextToken());
 			int k = Integer.parseInt(st.nextToken());
 			
-			reqPart[x][y] += k;
-			outDegree[y].add(x);
+			outDegree[y].add(new Edge(x, k));
 			inDegree[x]++;
 		}
 		
@@ -43,7 +46,7 @@ public class Main {
 		for(int i=1; i<=N; i++) {
 			if(inDegree[i] == 0) {
 				dq.offer(i);
-				isBasic[i] = true;
+				basicPart[i][i] = 1; //기본 부품 표기
 			}
 		}
 		
@@ -51,18 +54,15 @@ public class Main {
 		while(!dq.isEmpty()) {
 			int cur = dq.poll();
 			
-			for(int next : outDegree[cur]) {
-				if(isBasic[cur]) 
-					basicPart[next][cur] = 1*reqPart[next][cur];
-				else {
-					 for(int i=1; i<=N; i++) {
-						 if(basicPart[cur][i] != 0) 
-							 basicPart[next][i] += basicPart[cur][i]*reqPart[next][cur];
-					 }
+			for(Edge next : outDegree[cur]) {
+				for(int i=1; i<=N; i++) {
+					if(basicPart[cur][i] > 0) {
+						basicPart[next.v][i] += basicPart[cur][i] * next.w;
+					}
 				}
 				
-				if(--inDegree[next] == 0) {
-					dq.offer(next);
+				if(--inDegree[next.v] == 0) {
+					dq.offer(next.v);
 				}
 			}
 		}
@@ -70,7 +70,8 @@ public class Main {
 		/* 출력 */
 		StringBuilder sb = new StringBuilder();
 		for(int i=1; i<=N; i++) {
-			if(isBasic[i]) sb.append(i).append(" ").append(basicPart[N][i]).append("\n");
+			if(basicPart[N][i] > 0)
+				sb.append(i).append(" ").append(basicPart[N][i]).append("\n");
 		}
 		System.out.print(sb.toString());
 	}
