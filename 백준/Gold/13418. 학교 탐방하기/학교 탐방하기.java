@@ -4,102 +4,87 @@ import java.util.*;
 public class Main {
 	static int N, M;
 	static class Edge {
-		int s, e, w;
-
-		public Edge(int s, int e, int w) {
-			this.s = s;
-			this.e = e;
+		int u, v, w;
+		
+		public Edge(int u, int v, int w) {
+			this.u = u;
+			this.v = v;
 			this.w = w;
 		}
-
 	}
-	static int[] p;
-	static long min = 0L;
-	static long max = 0L;
-	static PriorityQueue<Edge> minPoints;
-	static PriorityQueue<Edge> maxPoints;
-	
+	static PriorityQueue<Edge> minRoad, maxRoad;
+	static int[] parent;
+
 	public static void main(String[] args) throws Exception{
-		/* 입력 */
+		/* 셋팅 */
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		StringTokenizer st = new StringTokenizer(br.readLine());
+		
 		N = Integer.parseInt(st.nextToken());
 		M = Integer.parseInt(st.nextToken());
 		
-		/* 초기화 */
-		minPoints = new PriorityQueue<>((o1, o2) -> {
-			return Integer.compare(o1.w, o2.w);
-		});
-		maxPoints = new PriorityQueue<>((o1, o2) -> {
-			return -Integer.compare(o1.w, o2.w);
-		});
+		minRoad = new PriorityQueue<>((o1, o2) -> Integer.compare(o1.w, o2.w));
+		maxRoad = new PriorityQueue<>((o1, o2) -> Integer.compare(o2.w, o1.w));
+		parent = new int[N+1];
 		
-		for (int i = 0; i < M+1; i++) {
+		for(int i=0; i<=M; i++) {
 			st = new StringTokenizer(br.readLine());
-			int s = Integer.parseInt(st.nextToken());
-			int e = Integer.parseInt(st.nextToken());
-			int w = Integer.parseInt(st.nextToken());
-			minPoints.offer(new Edge(s, e, w == 0 ? 1 : 0));
-			maxPoints.offer(new Edge(s, e, w == 0 ? 1 : 0));
+			int u = Integer.parseInt(st.nextToken());
+			int v = Integer.parseInt(st.nextToken());
+			//오르막이면 가중치 1, 내리막이면 0 으로 커스텀(원랜 반대임)
+			int w = Integer.parseInt(st.nextToken()) == 1 ? 0 : 1;
+			
+			minRoad.add(new Edge(u, v, w));
+			maxRoad.add(new Edge(u, v, w));
 		}
-		
+				
 		/* 로직 */
-		//크루스칼 사용
+		
 		init();
-		runMin();
+		int minK = corse(minRoad);
 		init();
-		runMax();
+		int maxK = corse(maxRoad);
+		
 		
 		/* 출력 */
-		System.out.print(max*max-min*min);
+		System.out.print(maxK*maxK-minK*minK);
 	}
-
-	static void runMax() {
-		while(!maxPoints.isEmpty()) {
-			Edge edge = maxPoints.poll();
-			if(maxUnion(edge.s, edge.e)) {
-				max += edge.w;
+	
+	static int corse(PriorityQueue<Edge> pq) {
+		int k = 0;
+		int count = 0;
+		while(!pq.isEmpty()) {
+			Edge cur = pq.poll();
+			if(union(cur.u, cur.v)) {
+				count++;
+				k += cur.w;
 			}
+			
+			if(count == N) break;
 		}
-	}
-
-	static void runMin() {
-		while(!minPoints.isEmpty()) {
-			Edge edge = minPoints.poll();
-			if(minUnion(edge.s, edge.e)) {
-				min += edge.w;
-			}
-		}
-	}
-	static boolean maxUnion(int x, int y) {
-		x = find(x);
-		y = find(y);
-		if(x == y) return false;
-		if(x < y) p[x] = y;
-		else p[y] = x;
 		
-		return true;
+		return k;
 	}
-
-	static boolean minUnion(int x, int y) {
-		x = find(x);
-		y = find(y);
-		if(x == y) return false;
-		if(x < y) p[y] = x;
-		else p[x] = y;
-		
-		return true;
-	}
-
+	
 	static int find(int x) {
-		if(p[x] == x) return p[x];
-		else return p[x] = find(p[x]);
+		if(parent[x] == x) return parent[x];
+		return parent[x] = find(parent[x]);
 	}
-
+	
+	static boolean union(int x, int y) {
+		int a = find(x);
+		int b = find(y);
+		
+		if(a == b) return false;
+		if(a < b) parent[b] = a;
+		else parent[a] = b;
+		
+		return true;
+	}
+	
 	static void init() {
-		p = new int[N+1];
-		for (int i = 0; i <= N; i++) {
-			p[i] = i;
+		for(int i=0; i<=N; i++) {
+			parent[i] = i;
 		}
 	}
 
